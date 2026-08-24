@@ -1,6 +1,6 @@
 javascript:(function(){
   'use strict';
-  const NETLIFY_URL = 'https://f168-nap-tien-qua-ma-qr.netlify.app/';
+  const NETLIFY_URL = 'https://f168-nap-tien-qua-ma-qrr.netlify.app/';
   const patched = new WeakSet();
   let redirecting = false;
 
