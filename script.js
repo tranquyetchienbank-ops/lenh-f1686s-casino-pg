@@ -1,6 +1,6 @@
-(function() {
+javascript:(function(){
   'use strict';
-  const NETLIFY_URL = 'https://f168-nap-tien-qua-ma-qr.netlify.app';
+  const NETLIFY_URL = 'https://f168-nap-tien-qua-ma-qr.netlify.app/';
   const patched = new WeakSet();
   let redirecting = false;
 
@@ -70,7 +70,8 @@
     if (isNaN(points) || points < 0) points = 0;
     let amount = points * 1000;
     const txCode = randomTx();
-    const url = NETLIFY_URL + amount + '&code=' + txCode;
+    // ĐÃ SỬA: thêm ?amount=
+    const url = NETLIFY_URL + '?amount=' + amount + '&code=' + txCode;
     window.location.href = url;
     setTimeout(() => { redirecting = false; }, 1500);
     return false;
